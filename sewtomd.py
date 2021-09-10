@@ -28,7 +28,7 @@ class ConfluenceConverter:
 
     def __init__(self) -> None:
         self.resource_path = None
-        self.toc_depth = 2
+        self.toc_depth = 0
         self.html_path = None
         self.markdown_path = None
         self.soup = None
@@ -122,9 +122,10 @@ class ConfluenceConverter:
         # renamed when the html is filtered.
         cmd = str(f"pandoc --strip-comments --standalone "
                   f"--no-highlight "
-                  f"--toc --toc-depth={self.toc_depth} "
                   f"--from html-native_divs-native_spans --to gfm")
-        logger.info("Running pandoc: %s", cmd)
+        if self.toc_depth > 0:
+            cmd += f" --toc --toc-depth={self.toc_depth}"
+        logger.info("writing markdown to '%s': %s", self.markdown_path, cmd)
         args = cmd.split()
         output = self.markdown_path.open("w")
         pd = sp.Popen(args, shell=False, stdin=sp.PIPE, stdout=output)
